@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Strategy Board</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff7e5f;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --light: #f8f9fa;
+            --gray: #2a2a2a;
+            --light-gray: #3a3a3a;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            --transition: all 0.3s ease;
+            --success: #00c9a7;
+            --warning: #ffc75f;
+            --danger: #ff6b6b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease;
+        }
+        
+        header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        header p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto;
+            color: #a0a0c0;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 25px;
+        }
+        
+        @media (max-width: 1000px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            background: rgba(30, 30, 46, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: fit-content;
+        }
+        
+        .sidebar h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .filters {
+            margin-bottom: 25px;
+        }
+        
+        .filter-group {
+            margin-bottom: 25px;
+        }
+        
+        .filter-group h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .filter-chip {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .filter-chip.active {
+            background: var(--primary);
+        }
+        
+        .filter-chip:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .add-category {
+            margin-top: 20px;
+        }
+        
+        .add-category-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .add-category-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            font-size: 1rem;
+        }
+        
+        .add-category-input button {
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .add-category-input button:hover {
+            background: #00b395;
+        }
+        
+        /* Strategy Board Styles */
+        .strategy-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 25px;
+        }
+        
+        .strategy-card {
+            background: rgba(30, 30, 46, 0.7);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            animation: fadeIn 0.5s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        .strategy-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-header {
+            padding: 20px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .category-tag {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .card-body p {
+            margin-bottom: 25px;
+            color: #c0c0e0;
+            line-height: 1.7;
+        }
+        
+        .priority {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+        
+        .priority.high {
+            background: rgba(255, 107, 107, 0.2);
+            color: var(--danger);
+        }
+        
+        .priority.medium {
+            background: rgba(255, 199, 95, 0.2);
+            color: var(--warning);
+        }
+        
+        .priority.low {
+            background: rgba(0, 201, 167, 0.2);
+            color: var(--success);
+        }
+        
+        .card-footer {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #444;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .actions button {
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: var(--transition);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .actions button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .actions button.edit:hover {
+            color: var(--warning);
+        }
+        
+        .actions button.delete:hover {
+            color: var(--danger);
+        }
+        
+        /* Add Strategy Form */
+        .add-strategy {
+            background: rgba(30, 30, 46, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            margin-top: 40px;
+            animation: slideInUp 0.5s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .add-strategy h2 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--light);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #b0b0d0;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--light);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.3);
+        }
+        
+        .form-group textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        @media (max-width: 700px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(106, 17, 203, 0.4);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            grid-column: 1 / -1;
+            background: rgba(30, 30, 46, 0.5);
+            border-radius: 15px;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+        }
+        
+        .empty-state i {
+            font-size: 5rem;
+            color: rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            font-size: 2rem;
+            color: #a0a0c0;
+            margin-bottom: 15px;
+        }
+        
+        .empty-state p {
+            color: #8080a0;
+            max-width: 500px;
+            margin: 0 auto 25px;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(30, 30, 46, 0.9);
+            color: var(--light);
+            padding: 18px 28px;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            border-left: 5px solid var(--success);
+            backdrop-filter: blur(10px);
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast i {
+            margin-right: 15px;
+            font-size: 1.8rem;
+            color: var(--success);
+        }
+        
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+        
+        .toast.error i {
+            color: var(--danger);
+        }
+        
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: rgba(30, 30, 46, 0.95);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 15px;
+            overflow: hidden;
+            transform: translateY(-50px);
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            padding: 25px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            font-size: 1.5rem;
+        }
+        
+        .modal-header .close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        
+        .modal-header .close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .modal-body p {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #c0c0e0;
+        }
+        
+        .modal-footer {
+            padding: 20px 30px;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background: #ff5252;
+        }
+        
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .stat-card .number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-card .label {
+            color: #a0a0c0;
+            font-size: 1.1rem;
+        }
+        
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 5px 25px rgba(106, 17, 203, 0.5);
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 99;
+            border: none;
+        }
+        
+        .floating-btn:hover {
+            transform: translateY(-5px) rotate(90deg);
+            box-shadow: 0 8px 30px rgba(106, 17, 203, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-chess-king"></i> Strategy Board</h1>
+            <p>Organize and manage your personal and competition strategies with custom categories</p>
+        </header>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-lightbulb"></i>
+                <div class="number" id="total-strategies">8</div>
+                <div class="label">Total Strategies</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-toggle-on"></i>
+                <div class="number" id="active-strategies">6</div>
+                <div class="label">Active Strategies</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-tags"></i>
+                <div class="number" id="total-categories">5</div>
+                <div class="label">Categories</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-trophy"></i>
+                <div class="number" id="competition-strategies">3</div>
+                <div class="label">Competition</div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <h2><i class="fas fa-filter"></i> Filters</h2>
+                
+                <div class="filters">
+                    <div class="filter-group">
+                        <h3><i class="fas fa-tag"></i> Categories</h3>
+                        <div class="filter-options" id="category-filters">
+                            <!-- Categories will be added here dynamically -->
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <h3><i class="fas fa-bolt"></i> Status</h3>
+                        <div class="filter-options">
+                            <div class="filter-chip active" data-filter="status" data-value="all">
+                                <i class="fas fa-layer-group"></i> All
+                            </div>
+                            <div class="filter-chip" data-filter="status" data-value="active">
+                                <i class="fas fa-toggle-on"></i> Active
+                            </div>
+                            <div class="filter-chip" data-filter="status" data-value="inactive">
+                                <i class="fas fa-toggle-off"></i> Inactive
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <h3><i class="fas fa-flag"></i> Priority</h3>
+                        <div class="filter-options">
+                            <div class="filter-chip active" data-filter="priority" data-value="all">
+                                <i class="fas fa-layer-group"></i> All
+                            </div>
+                            <div class="filter-chip" data-filter="priority" data-value="high">
+                                <i class="fas fa-exclamation-circle"></i> High
+                            </div>
+                            <div class="filter-chip" data-filter="priority" data-value="medium">
+                                <i class="fas fa-arrow-up"></i> Medium
+                            </div>
+                            <div class="filter-chip" data-filter="priority" data-value="low">
+                                <i class="fas fa-arrow-down"></i> Low
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="add-category">
+                    <h3><i class="fas fa-plus-circle"></i> Add New Category</h3>
+                    <div class="add-category-input">
+                        <input type="text" id="new-category" placeholder="Enter category name">
+                        <button id="add-category-btn"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="strategy-board">
+                <!-- Strategy cards will be generated here -->
+            </div>
+        </div>
+        
+        <div class="add-strategy">
+            <h2><i class="fas fa-plus-circle"></i> Add New Strategy</h2>
+            <form id="strategy-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="strategy-title"><i class="fas fa-heading"></i> Strategy Title</label>
+                        <input type="text" id="strategy-title" placeholder="Enter strategy title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="strategy-category"><i class="fas fa-tag"></i> Category</label>
+                        <select id="strategy-category" required>
+                            <option value="">Select category</option>
+                            <!-- Categories will be populated here -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="strategy-priority"><i class="fas fa-flag"></i> Priority</label>
+                        <select id="strategy-priority" required>
+                            <option value="">Select priority</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="strategy-status"><i class="fas fa-toggle-on"></i> Initial Status</label>
+                        <select id="strategy-status" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="strategy-description"><i class="fas fa-align-left"></i> Description</label>
+                    <textarea id="strategy-description" placeholder="Describe your strategy in detail..." required></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-block">
+                    <i class="fas fa-plus"></i> Add Strategy
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <button class="floating-btn" id="new-strategy-btn">
+        <i class="fas fa-plus"></i>
+    </button>
+    
+    <!-- Toast Notification -->
+    <div class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span class="toast-message">Strategy added successfully!</span>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="delete-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Deletion</h3>
+                <button class="close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the "<span id="strategy-name"></span>" strategy? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-delete">Cancel</button>
+                <button class="btn btn-danger" id="confirm-delete">Delete</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sample categories
+        let categories = [
+            "Daily Routine",
+            "Competition",
+            "Business",
+            "Personal Growth",
+            "Health & Fitness"
+        ];
+        
+        // Sample strategy data
+        let strategies = [
+            {
+                id: 1,
+                title: "Morning Routine Optimization",
+                category: "Daily Routine",
+                description: "Start each day with 30 minutes of planning, exercise, and meditation to maximize productivity and mental clarity.",
+                priority: "high",
+                active: true
+            },
+            {
+                id: 2,
+                title: "Competitive Analysis Framework",
+                category: "Competition",
+                description: "Analyze competitors using SWOT analysis every quarter to identify market opportunities and threats.",
+                priority: "high",
+                active: true
+            },
+            {
+                id: 3,
+                title: "Time Blocking Technique",
+                category: "Daily Routine",
+                description: "Divide your day into focused blocks of time dedicated to specific tasks to minimize distractions and improve efficiency.",
+                priority: "medium",
+                active: true
+            },
+            {
+                id: 4,
+                title: "Pre-Game Mental Preparation",
+                category: "Competition",
+                description: "Use visualization techniques and breathing exercises to achieve optimal mental state before competitions.",
+                priority: "medium",
+                active: false
+            },
+            {
+                id: 5,
+                title: "Decision Matrix for Choices",
+                category: "Business",
+                description: "Create a weighted matrix to evaluate options when facing complex decisions with multiple variables.",
+                priority: "high",
+                active: true
+            },
+            {
+                id: 6,
+                title: "Networking Strategy",
+                category: "Business",
+                description: "Attend two industry events per month and follow up with five new contacts each week to expand your network.",
+                priority: "medium",
+                active: true
+            },
+            {
+                id: 7,
+                title: "Learning Sprint Technique",
+                category: "Personal Growth",
+                description: "Dedicate 25-minute focused sprints to learning new skills with 5-minute breaks in between to maximize retention.",
+                priority: "low",
+                active: false
+            },
+            {
+                id: 8,
+                title: "Workout Routine Optimization",
+                category: "Health & Fitness",
+                description: "Combine strength training and cardio in alternating days for maximum fitness results with optimal recovery.",
+                priority: "medium",
+                active: true
+            }
+        ];
+        
+        // DOM Elements
+        const strategyBoard = document.querySelector('.strategy-board');
+        const strategyForm = document.getElementById('strategy-form');
+        const categoryFilters = document.getElementById('category-filters');
+        const categorySelect = document.getElementById('strategy-category');
+        const toast = document.querySelector('.toast');
+        const deleteModal = document.getElementById('delete-modal');
+        const cancelDeleteBtn = document.getElementById('cancel-delete');
+        const confirmDeleteBtn = document.getElementById('confirm-delete');
+        const closeModalBtn = document.querySelector('.close');
+        const newCategoryInput = document.getElementById('new-category');
+        const addCategoryBtn = document.getElementById('add-category-btn');
+        const strategyNameSpan = document.getElementById('strategy-name');
+        const newStrategyBtn = document.getElementById('new-strategy-btn');
+        
+        // Stats elements
+        const totalStrategiesEl = document.getElementById('total-strategies');
+        const activeStrategiesEl = document.getElementById('active-strategies');
+        const totalCategoriesEl = document.getElementById('total-categories');
+        const competitionStrategiesEl = document.getElementById('competition-strategies');
+        
+        // State variables
+        let strategyToDelete = null;
+        let selectedCategories = [];
+        let selectedStatus = "all";
+        let selectedPriority = "all";
+        
+        // Initialize the app
+        function init() {
+            renderCategories();
+            renderStrategies();
+            updateStats();
+            setupEventListeners();
+        }
+        
+        // Render categories in filters and select
+        function renderCategories() {
+            // Clear existing options
+            categoryFilters.innerHTML = '';
+            categorySelect.innerHTML = '<option value="">Select category</option>';
+            
+            // Add "All" option to filters
+            const allChip = document.createElement('div');
+            allChip.className = 'filter-chip active';
+            allChip.innerHTML = '<i class="fas fa-layer-group"></i> All';
+            allChip.dataset.filter = "category";
+            allChip.dataset.value = "all";
+            categoryFilters.appendChild(allChip);
+            
+            // Add each category to filters and select
+            categories.forEach(category => {
+                // Add to category filters
+                const chip = document.createElement('div');
+                chip.className = 'filter-chip';
+                chip.innerHTML = `<i class="fas fa-tag"></i> ${category}`;
+                chip.dataset.filter = "category";
+                chip.dataset.value = category;
+                categoryFilters.appendChild(chip);
+                
+                // Add to category select dropdown
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categorySelect.appendChild(option);
+            });
+            
+            // Add event listeners to category filters
+            document.querySelectorAll('[data-filter="category"]').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const value = chip.dataset.value;
+                    
+                    if (value === "all") {
+                        // Toggle "All" chip
+                        document.querySelectorAll('[data-filter="category"]').forEach(c => c.classList.remove('active'));
+                        chip.classList.add('active');
+                        selectedCategories = [];
+                    } else {
+                        // Toggle specific category chip
+                        document.querySelector('[data-filter="category"][data-value="all"]').classList.remove('active');
+                        chip.classList.toggle('active');
+                        
+                        if (chip.classList.contains('active')) {
+                            selectedCategories.push(value);
+                        } else {
+                            selectedCategories = selectedCategories.filter(cat => cat !== value);
+                        }
+                        
+                        // If no categories selected, activate "All"
+                        if (selectedCategories.length === 0) {
+                            document.querySelector('[data-filter="category"][data-value="all"]').classList.add('active');
+                        }
+                    }
+                    
+                    renderStrategies();
+                });
+            });
+        }
+        
+        // Render strategy cards
+        function renderStrategies() {
+            strategyBoard.innerHTML = '';
+            
+            // Filter strategies
+            let filteredStrategies = strategies.filter(strategy => {
+                // Category filter
+                if (selectedCategories.length > 0 && !selectedCategories.includes(strategy.category)) {
+                    return false;
+                }
+                
+                // Status filter
+                if (selectedStatus !== "all") {
+                    if (selectedStatus === "active" && !strategy.active) return false;
+                    if (selectedStatus === "inactive" && strategy.active) return false;
+                }
+                
+                // Priority filter
+                if (selectedPriority !== "all" && selectedPriority !== strategy.priority) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            if (filteredStrategies.length === 0) {
+                strategyBoard.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>No Strategies Found</h3>
+                        <p>Try changing your filters or add a new strategy to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredStrategies.forEach(strategy => {
+                const priorityClass = strategy.priority;
+                const priorityNames = {
+                    'high': 'High Priority',
+                    'medium': 'Medium Priority',
+                    'low': 'Low Priority'
+                };
+                
+                const strategyCard = document.createElement('div');
+                strategyCard.className = 'strategy-card';
+                strategyCard.innerHTML = `
+                    <div class="card-header">
+                        <h3>${strategy.title}</h3>
+                        <span class="category-tag">${strategy.category}</span>
+                    </div>
+                    <div class="card-body">
+                        <p>${strategy.description}</p>
+                        <div class="priority ${priorityClass}">
+                            <i class="fas fa-${priorityClass === 'high' ? 'exclamation-circle' : priorityClass === 'medium' ? 'arrow-up' : 'arrow-down'}"></i>
+                            ${priorityNames[strategy.priority]}
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="toggle-container">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-${strategy.id}" ${strategy.active ? 'checked' : ''}>
+                                <span class="slider"></span>
+                            </label>
+                            <span>${strategy.active ? 'Active' : 'Inactive'}</span>
+                        </div>
+                        <div class="actions">
+                            <button class="edit-btn" data-id="${strategy.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="delete-btn" data-id="${strategy.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                strategyBoard.appendChild(strategyCard);
+                
+                // Add event listener to the toggle
+                const toggle = strategyCard.querySelector(`#toggle-${strategy.id}`);
+                toggle.addEventListener('change', () => {
+                    toggleStrategyStatus(strategy.id, toggle.checked);
+                });
+                
+                // Add event listener to delete button
+                const deleteBtn = strategyCard.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', () => {
+                    showDeleteModal(strategy.id);
+                });
+                
+                // Add event listener to edit button
+                const editBtn = strategyCard.querySelector('.edit-btn');
+                editBtn.addEventListener('click', () => {
+                    editStrategy(strategy.id);
+                });
+            });
+        }
+        
+        // Toggle strategy active status
+        function toggleStrategyStatus(id, isActive) {
+            const strategyIndex = strategies.findIndex(s => s.id === id);
+            if (strategyIndex !== -1) {
+                strategies[strategyIndex].active = isActive;
+                updateStats();
+                showToast(`Strategy marked as ${isActive ? 'active' : 'inactive'}`, 'success');
+            }
+        }
+        
+        // Show delete confirmation modal
+        function showDeleteModal(id) {
+            const strategy = strategies.find(s => s.id === id);
+            if (strategy) {
+                strategyToDelete = id;
+                strategyNameSpan.textContent = strategy.title;
+                deleteModal.classList.add('show');
+            }
+        }
+        
+        // Close delete confirmation modal
+        function closeDeleteModal() {
+            deleteModal.classList.remove('show');
+            strategyToDelete = null;
+        }
+        
+        // Delete a strategy
+        function deleteStrategy() {
+            if (!strategyToDelete) return;
+            
+            strategies = strategies.filter(strategy => strategy.id !== strategyToDelete);
+            renderStrategies();
+            updateStats();
+            closeDeleteModal();
+            showToast('Strategy deleted successfully', 'success');
+        }
+        
+        // Edit a strategy
+        function editStrategy(id) {
+            const strategy = strategies.find(s => s.id === id);
+            if (strategy) {
+                // Fill the form with strategy data
+                document.getElementById('strategy-title').value = strategy.title;
+                document.getElementById('strategy-category').value = strategy.category;
+                document.getElementById('strategy-priority').value = strategy.priority;
+                document.getElementById('strategy-status').value = strategy.active ? 'active' : 'inactive';
+                document.getElementById('strategy-description').value = strategy.description;
+                
+                // Change button to "Update Strategy"
+                const submitBtn = document.querySelector('#strategy-form button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Update Strategy';
+                submitBtn.dataset.editingId = id;
+                
+                // Scroll to form
+                document.querySelector('.add-strategy').scrollIntoView({ behavior: 'smooth' });
+                
+                showToast('Strategy loaded for editing', 'success');
+            }
+        }
+        
+        // Add new strategy
+        function addStrategy(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('strategy-title').value;
+            const category = document.getElementById('strategy-category').value;
+            const priority = document.getElementById('strategy-priority').value;
+            const status = document.getElementById('strategy-status').value;
+            const description = document.getElementById('strategy-description').value;
+            
+            const isEditing = e.target.querySelector('button').dataset.editingId;
+            
+            if (isEditing) {
+                // Update existing strategy
+                const id = parseInt(isEditing);
+                const strategyIndex = strategies.findIndex(s => s.id === id);
+                
+                if (strategyIndex !== -1) {
+                    strategies[strategyIndex] = {
+                        ...strategies[strategyIndex],
+                        title,
+                        category,
+                        priority,
+                        active: status === 'active',
+                        description
+                    };
+                    
+                    showToast('Strategy updated successfully', 'success');
+                }
+                
+                // Reset form button
+                const submitBtn = document.querySelector('#strategy-form button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Strategy';
+                delete submitBtn.dataset.editingId;
+            } else {
+                // Add new strategy
+                const newStrategy = {
+                    id: strategies.length > 0 ? Math.max(...strategies.map(s => s.id)) + 1 : 1,
+                    title,
+                    category,
+                    description,
+                    priority,
+                    active: status === 'active'
+                };
+                
+                strategies.push(newStrategy);
+                showToast('Strategy added successfully!', 'success');
+            }
+            
+            // Reset form
+            strategyForm.reset();
+            renderStrategies();
+            updateStats();
+        }
+        
+        // Add new category
+        function addNewCategory() {
+            const newCategory = newCategoryInput.value.trim();
+            if (!newCategory) return;
+            
+            if (!categories.includes(newCategory)) {
+                categories.push(newCategory);
+                renderCategories();
+                newCategoryInput.value = '';
+                showToast(`Category "${newCategory}" added`, 'success');
+                updateStats();
+            } else {
+                showToast(`Category "${newCategory}" already exists`, 'error');
+            }
+        }
+        
+        // Update stats display
+        function updateStats() {
+            totalStrategiesEl.textContent = strategies.length;
+            
+            const activeCount = strategies.filter(s => s.active).length;
+            activeStrategiesEl.textContent = activeCount;
+            
+            totalCategoriesEl.textContent = categories.length;
+            
+            const competitionCount = strategies.filter(s => s.category === "Competition").length;
+            competitionStrategiesEl.textContent = competitionCount;
+        }
+        
+        // Show toast notification
+        function showToast(message, type) {
+            const toastMessage = toast.querySelector('.toast-message');
+            toastMessage.textContent = message;
+            
+            // Set type (success or error)
+            toast.className = 'toast';
+            if (type === 'error') toast.classList.add('error');
+            toast.classList.add('show');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Scroll to strategy form
+        function scrollToForm() {
+            document.querySelector('.add-strategy').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            strategyForm.addEventListener('submit', addStrategy);
+            
+            // Delete modal events
+            confirmDeleteBtn.addEventListener('click', deleteStrategy);
+            cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+            closeModalBtn.addEventListener('click', closeDeleteModal);
+            
+            // Close modal when clicking outside
+            deleteModal.addEventListener('click', (e) => {
+                if (e.target === deleteModal) {
+                    closeDeleteModal();
+                }
+            });
+            
+            // Add category button
+            addCategoryBtn.addEventListener('click', addNewCategory);
+            newCategoryInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addNewCategory();
+                }
+            });
+            
+            // Status filter chips
+            document.querySelectorAll('[data-filter="status"]').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const value = chip.dataset.value;
+                    
+                    // Update selected status
+                    selectedStatus = value;
+                    
+                    // Update UI
+                    document.querySelectorAll('[data-filter="status"]').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    
+                    renderStrategies();
+                });
+            });
+            
+            // Priority filter chips
+            document.querySelectorAll('[data-filter="priority"]').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const value = chip.dataset.value;
+                    
+                    // Update selected priority
+                    selectedPriority = value;
+                    
+                    // Update UI
+                    document.querySelectorAll('[data-filter="priority"]').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    
+                    renderStrategies();
+                });
+            });
+            
+            // Floating button to scroll to form
+            newStrategyBtn.addEventListener('click', scrollToForm);
+        }
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
