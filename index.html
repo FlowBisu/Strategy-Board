@@ -3,23 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Strategy Board</title>
+    <title>Strategy Board Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4cc9f0;
+            --success: #2ec4b6;
+            --warning: #ff9f1c;
+            --danger: #e71d36;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --card-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --bg: #f5f7ff;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --border: #e0e0e0;
+        }
+
+        .dark-mode {
             --primary: #6a11cb;
             --secondary: #2575fc;
-            --accent: #ff7e5f;
-            --dark: #121212;
-            --darker: #0a0a0a;
-            --light: #f8f9fa;
-            --gray: #2a2a2a;
-            --light-gray: #3a3a3a;
-            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            --transition: all 0.3s ease;
-            --success: #00c9a7;
-            --warning: #ffc75f;
-            --danger: #ff6b6b;
+            --bg: #121420;
+            --card-bg: #1a1d2e;
+            --text: #f0f0f0;
+            --border: #2a2a3c;
         }
         
         * {
@@ -27,11 +38,12 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
         
         body {
-            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
-            color: var(--light);
+            background-color: var(--bg);
+            color: var(--text);
             line-height: 1.6;
             min-height: 100vh;
             padding: 20px;
@@ -44,31 +56,66 @@
         }
         
         header {
-            text-align: center;
-            padding: 40px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
             margin-bottom: 30px;
-            animation: fadeInDown 0.8s ease;
+            border-bottom: 2px solid var(--border);
         }
         
-        header h1 {
-            font-size: 3.5rem;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo h1 {
+            font-size: 2.5rem;
             background: linear-gradient(45deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 15px;
-            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         
-        header p {
-            font-size: 1.3rem;
-            max-width: 800px;
-            margin: 0 auto;
-            color: #a0a0c0;
+        .logo i {
+            font-size: 2.2rem;
+            color: var(--primary);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .mode-toggle {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            width: 60px;
+            height: 30px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .toggle-handle {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        
+        .dark-mode .toggle-handle {
+            transform: translateX(30px);
         }
         
         .main-content {
             display: grid;
-            grid-template-columns: 300px 1fr;
+            grid-template-columns: 280px 1fr;
             gap: 25px;
         }
         
@@ -80,69 +127,25 @@
         
         /* Sidebar Styles */
         .sidebar {
-            background: rgba(30, 30, 46, 0.7);
+            background: var(--card-bg);
             border-radius: 15px;
             padding: 25px;
             box-shadow: var(--card-shadow);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
             height: fit-content;
+            border: 1px solid var(--border);
         }
         
         .sidebar h2 {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             margin-bottom: 20px;
-            color: var(--light);
+            color: var(--primary);
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-        
-        .filters {
-            margin-bottom: 25px;
-        }
-        
-        .filter-group {
-            margin-bottom: 25px;
-        }
-        
-        .filter-group h3 {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: var(--accent);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .filter-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .filter-chip {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .filter-chip.active {
-            background: var(--primary);
-        }
-        
-        .filter-chip:hover {
-            background: rgba(255, 255, 255, 0.2);
         }
         
         .add-category {
-            margin-top: 20px;
+            margin-top: 25px;
         }
         
         .add-category-input {
@@ -154,10 +157,10 @@
         .add-category-input input {
             flex: 1;
             padding: 12px 15px;
-            border: none;
+            border: 1px solid var(--border);
             border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--light);
+            background: var(--card-bg);
+            color: var(--text);
             font-size: 1rem;
         }
         
@@ -169,107 +172,151 @@
             padding: 0 20px;
             cursor: pointer;
             transition: var(--transition);
+            font-weight: 600;
         }
         
         .add-category-input button:hover {
             background: #00b395;
         }
         
-        /* Strategy Board Styles */
-        .strategy-board {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-            gap: 25px;
-        }
-        
-        .strategy-card {
-            background: rgba(30, 30, 46, 0.7);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-            transition: var(--transition);
-            animation: fadeIn 0.5s ease;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-        }
-        
-        .strategy-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-        
-        .card-header {
-            padding: 20px;
-            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+        /* Stats */
+        .stats {
+            margin-top: 25px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
+            padding: 20px;
+            border-radius: 12px;
+        }
+        
+        .stats h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Kanban Board */
+        .kanban-board {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 10px 5px 30px;
+        }
+        
+        .board-column {
+            min-width: 300px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+            border: 1px solid var(--border);
+            height: fit-content;
+        }
+        
+        .column-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
         }
         
-        .card-header h3 {
+        .column-header h3 {
             font-size: 1.4rem;
-            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .category-tag {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
+        .strategy-list {
+            min-height: 100px;
         }
         
-        .card-body {
-            padding: 20px;
+        .strategy-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            cursor: move;
+            transition: var(--transition);
         }
         
-        .card-body p {
-            margin-bottom: 25px;
-            color: #c0c0e0;
-            line-height: 1.7;
+        .strategy-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .card-header h4 {
+            font-size: 1.2rem;
+            color: var(--primary);
         }
         
         .priority {
             display: inline-flex;
             align-items: center;
-            padding: 5px 12px;
+            padding: 4px 12px;
             border-radius: 20px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 500;
-            margin-bottom: 15px;
         }
         
         .priority.high {
-            background: rgba(255, 107, 107, 0.2);
+            background: rgba(231, 29, 54, 0.15);
             color: var(--danger);
         }
         
         .priority.medium {
-            background: rgba(255, 199, 95, 0.2);
+            background: rgba(255, 159, 28, 0.15);
             color: var(--warning);
         }
         
         .priority.low {
-            background: rgba(0, 201, 167, 0.2);
+            background: rgba(46, 196, 182, 0.15);
             color: var(--success);
         }
         
+        .card-body p {
+            color: var(--text);
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        
         .card-footer {
-            padding: 15px 20px;
-            background: rgba(0, 0, 0, 0.2);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
         .toggle-switch {
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 24px;
+            width: 45px;
+            height: 22px;
         }
         
         .toggle-switch input {
@@ -285,7 +332,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #444;
+            background-color: #ccc;
             transition: .4s;
             border-radius: 34px;
         }
@@ -293,8 +340,8 @@
         .slider:before {
             position: absolute;
             content: "";
-            height: 18px;
-            width: 18px;
+            height: 16px;
+            width: 16px;
             left: 3px;
             bottom: 3px;
             background-color: white;
@@ -307,19 +354,19 @@
         }
         
         input:checked + .slider:before {
-            transform: translateX(26px);
+            transform: translateX(23px);
         }
         
         .actions button {
             background: none;
             border: none;
-            color: var(--light);
-            font-size: 1.1rem;
+            color: var(--text);
+            font-size: 1rem;
             cursor: pointer;
-            margin-left: 10px;
+            margin-left: 8px;
             transition: var(--transition);
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
@@ -327,7 +374,7 @@
         }
         
         .actions button:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.05);
         }
         
         .actions button.edit:hover {
@@ -340,20 +387,18 @@
         
         /* Add Strategy Form */
         .add-strategy {
-            background: rgba(30, 30, 46, 0.7);
+            background: var(--card-bg);
             border-radius: 15px;
             padding: 30px;
             box-shadow: var(--card-shadow);
             margin-top: 40px;
-            animation: slideInUp 0.5s ease;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
         }
         
         .add-strategy h2 {
             font-size: 1.8rem;
             margin-bottom: 25px;
-            color: var(--light);
+            color: var(--primary);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -367,7 +412,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #b0b0d0;
+            color: var(--text);
         }
         
         .form-group input,
@@ -375,10 +420,10 @@
         .form-group select {
             width: 100%;
             padding: 14px 18px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
             border-radius: 10px;
-            background: rgba(0, 0, 0, 0.2);
-            color: var(--light);
+            background: var(--card-bg);
+            color: var(--text);
             font-size: 1rem;
             transition: var(--transition);
         }
@@ -388,7 +433,7 @@
         .form-group select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.3);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
         }
         
         .form-group textarea {
@@ -424,7 +469,7 @@
         
         .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 7px 20px rgba(106, 17, 203, 0.4);
+            box-shadow: 0 7px 20px rgba(67, 97, 238, 0.4);
         }
         
         .btn-block {
@@ -432,67 +477,22 @@
             width: 100%;
         }
         
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            grid-column: 1 / -1;
-            background: rgba(30, 30, 46, 0.5);
-            border-radius: 15px;
-            border: 2px dashed rgba(255, 255, 255, 0.1);
-        }
-        
-        .empty-state i {
-            font-size: 5rem;
-            color: rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
-        }
-        
-        .empty-state h3 {
-            font-size: 2rem;
-            color: #a0a0c0;
-            margin-bottom: 15px;
-        }
-        
-        .empty-state p {
-            color: #8080a0;
-            max-width: 500px;
-            margin: 0 auto 25px;
-        }
-        
         /* Toast Notification */
         .toast {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: rgba(30, 30, 46, 0.9);
-            color: var(--light);
+            background: var(--card-bg);
+            color: var(--text);
             padding: 18px 28px;
             border-radius: 12px;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
             display: flex;
             align-items: center;
             z-index: 1000;
             transform: translateX(150%);
             transition: transform 0.3s ease;
             border-left: 5px solid var(--success);
-            backdrop-filter: blur(10px);
         }
         
         .toast.show {
@@ -528,7 +528,6 @@
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
         }
         
         .modal.show {
@@ -537,16 +536,15 @@
         }
         
         .modal-content {
-            background: rgba(30, 30, 46, 0.95);
+            background: var(--card-bg);
             width: 90%;
             max-width: 500px;
             border-radius: 15px;
             overflow: hidden;
             transform: translateY(-50px);
             transition: transform 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: var(--card-shadow);
-            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
         }
         
         .modal.show .modal-content {
@@ -592,23 +590,24 @@
         .modal-body p {
             font-size: 1.1rem;
             line-height: 1.7;
-            color: #c0c0e0;
+            color: var(--text);
         }
         
         .modal-footer {
             padding: 20px 30px;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.05);
             display: flex;
             justify-content: flex-end;
             gap: 15px;
         }
         
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text);
         }
         
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.1);
         }
         
         .btn-danger {
@@ -619,146 +618,78 @@
             background: #ff5252;
         }
         
-        /* Stats */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 20px;
+        /* Empty state */
+        .empty-state {
             text-align: center;
-            transition: var(--transition);
+            padding: 40px 20px;
+            color: var(--gray);
         }
         
-        .stat-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.08);
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--border);
+            margin-bottom: 20px;
+            opacity: 0.5;
         }
         
-        .stat-card i {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: var(--primary);
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
         }
         
-        .stat-card .number {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .empty-state p {
+            max-width: 500px;
+            margin: 0 auto;
         }
         
-        .stat-card .label {
-            color: #a0a0c0;
-            font-size: 1.1rem;
+        /* Drag and drop styling */
+        .strategy-card.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
         }
         
-        .floating-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            box-shadow: 0 5px 25px rgba(106, 17, 203, 0.5);
-            cursor: pointer;
-            transition: var(--transition);
-            z-index: 99;
-            border: none;
-        }
-        
-        .floating-btn:hover {
-            transform: translateY(-5px) rotate(90deg);
-            box-shadow: 0 8px 30px rgba(106, 17, 203, 0.7);
+        .board-column.drop-over {
+            background: rgba(106, 17, 203, 0.05);
+            border: 2px dashed var(--primary);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-chess-king"></i> Strategy Board</h1>
-            <p>Organize and manage your personal and competition strategies with custom categories</p>
+            <div class="logo">
+                <i class="fas fa-chess-knight"></i>
+                <h1>Strategy Board</h1>
+            </div>
+            <div class="controls">
+                <div class="mode-toggle" id="mode-toggle">
+                    <div class="toggle-handle"></div>
+                </div>
+                <button class="btn" id="new-strategy-btn">
+                    <i class="fas fa-plus"></i> New Strategy
+                </button>
+            </div>
         </header>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <i class="fas fa-lightbulb"></i>
-                <div class="number" id="total-strategies">8</div>
-                <div class="label">Total Strategies</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-toggle-on"></i>
-                <div class="number" id="active-strategies">6</div>
-                <div class="label">Active Strategies</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-tags"></i>
-                <div class="number" id="total-categories">5</div>
-                <div class="label">Categories</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-trophy"></i>
-                <div class="number" id="competition-strategies">3</div>
-                <div class="label">Competition</div>
-            </div>
-        </div>
         
         <div class="main-content">
             <div class="sidebar">
-                <h2><i class="fas fa-filter"></i> Filters</h2>
+                <h2><i class="fas fa-tags"></i> Categories</h2>
                 
-                <div class="filters">
-                    <div class="filter-group">
-                        <h3><i class="fas fa-tag"></i> Categories</h3>
-                        <div class="filter-options" id="category-filters">
-                            <!-- Categories will be added here dynamically -->
-                        </div>
+                <div class="categories">
+                    <div class="filter-chip active" data-category="all">
+                        <i class="fas fa-layer-group"></i> All Strategies
                     </div>
-                    
-                    <div class="filter-group">
-                        <h3><i class="fas fa-bolt"></i> Status</h3>
-                        <div class="filter-options">
-                            <div class="filter-chip active" data-filter="status" data-value="all">
-                                <i class="fas fa-layer-group"></i> All
-                            </div>
-                            <div class="filter-chip" data-filter="status" data-value="active">
-                                <i class="fas fa-toggle-on"></i> Active
-                            </div>
-                            <div class="filter-chip" data-filter="status" data-value="inactive">
-                                <i class="fas fa-toggle-off"></i> Inactive
-                            </div>
-                        </div>
+                    <div class="filter-chip" data-category="daily">
+                        <i class="fas fa-sun"></i> Daily Life
                     </div>
-                    
-                    <div class="filter-group">
-                        <h3><i class="fas fa-flag"></i> Priority</h3>
-                        <div class="filter-options">
-                            <div class="filter-chip active" data-filter="priority" data-value="all">
-                                <i class="fas fa-layer-group"></i> All
-                            </div>
-                            <div class="filter-chip" data-filter="priority" data-value="high">
-                                <i class="fas fa-exclamation-circle"></i> High
-                            </div>
-                            <div class="filter-chip" data-filter="priority" data-value="medium">
-                                <i class="fas fa-arrow-up"></i> Medium
-                            </div>
-                            <div class="filter-chip" data-filter="priority" data-value="low">
-                                <i class="fas fa-arrow-down"></i> Low
-                            </div>
-                        </div>
+                    <div class="filter-chip" data-category="competition">
+                        <i class="fas fa-trophy"></i> Competition
+                    </div>
+                    <div class="filter-chip" data-category="business">
+                        <i class="fas fa-briefcase"></i> Business
+                    </div>
+                    <div class="filter-chip" data-category="personal">
+                        <i class="fas fa-brain"></i> Personal Growth
                     </div>
                 </div>
                 
@@ -766,36 +697,93 @@
                     <h3><i class="fas fa-plus-circle"></i> Add New Category</h3>
                     <div class="add-category-input">
                         <input type="text" id="new-category" placeholder="Enter category name">
-                        <button id="add-category-btn"><i class="fas fa-plus"></i></button>
+                        <button id="add-category-btn"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <h3><i class="fas fa-chart-bar"></i> Strategy Stats</h3>
+                    <div class="stat-item">
+                        <span>Total Strategies:</span>
+                        <span id="total-strategies">8</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Active:</span>
+                        <span id="active-strategies">6</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Categories:</span>
+                        <span id="total-categories">5</span>
                     </div>
                 </div>
             </div>
             
-            <div class="strategy-board">
-                <!-- Strategy cards will be generated here -->
+            <div class="kanban-board">
+                <div class="board-column" data-status="planning">
+                    <div class="column-header">
+                        <h3><i class="fas fa-lightbulb"></i> Planning</h3>
+                        <span class="count">3</span>
+                    </div>
+                    <div class="strategy-list" id="planning-column">
+                        <!-- Planning strategies will be added here -->
+                    </div>
+                </div>
+                
+                <div class="board-column" data-status="active">
+                    <div class="column-header">
+                        <h3><i class="fas fa-play-circle"></i> Active</h3>
+                        <span class="count">3</span>
+                    </div>
+                    <div class="strategy-list" id="active-column">
+                        <!-- Active strategies will be added here -->
+                    </div>
+                </div>
+                
+                <div class="board-column" data-status="review">
+                    <div class="column-header">
+                        <h3><i class="fas fa-search"></i> Review</h3>
+                        <span class="count">2</span>
+                    </div>
+                    <div class="strategy-list" id="review-column">
+                        <!-- Review strategies will be added here -->
+                    </div>
+                </div>
+                
+                <div class="board-column" data-status="completed">
+                    <div class="column-header">
+                        <h3><i class="fas fa-check-circle"></i> Completed</h3>
+                        <span class="count">0</span>
+                    </div>
+                    <div class="strategy-list" id="completed-column">
+                        <!-- Completed strategies will be added here -->
+                    </div>
+                </div>
             </div>
         </div>
         
-        <div class="add-strategy">
+        <div class="add-strategy" id="strategy-form-container">
             <h2><i class="fas fa-plus-circle"></i> Add New Strategy</h2>
             <form id="strategy-form">
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="strategy-title"><i class="fas fa-heading"></i> Strategy Title</label>
+                        <label for="strategy-title">Strategy Title</label>
                         <input type="text" id="strategy-title" placeholder="Enter strategy title" required>
                     </div>
                     <div class="form-group">
-                        <label for="strategy-category"><i class="fas fa-tag"></i> Category</label>
+                        <label for="strategy-category">Category</label>
                         <select id="strategy-category" required>
                             <option value="">Select category</option>
-                            <!-- Categories will be populated here -->
+                            <option value="daily">Daily Life</option>
+                            <option value="competition">Competition</option>
+                            <option value="business">Business</option>
+                            <option value="personal">Personal Growth</option>
                         </select>
                     </div>
                 </div>
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="strategy-priority"><i class="fas fa-flag"></i> Priority</label>
+                        <label for="strategy-priority">Priority</label>
                         <select id="strategy-priority" required>
                             <option value="">Select priority</option>
                             <option value="high">High</option>
@@ -804,16 +792,18 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="strategy-status"><i class="fas fa-toggle-on"></i> Initial Status</label>
+                        <label for="strategy-status">Status</label>
                         <select id="strategy-status" required>
+                            <option value="planning">Planning</option>
                             <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
+                            <option value="review">Review</option>
+                            <option value="completed">Completed</option>
                         </select>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label for="strategy-description"><i class="fas fa-align-left"></i> Description</label>
+                    <label for="strategy-description">Description</label>
                     <textarea id="strategy-description" placeholder="Describe your strategy in detail..." required></textarea>
                 </div>
                 
@@ -823,10 +813,6 @@
             </form>
         </div>
     </div>
-    
-    <button class="floating-btn" id="new-strategy-btn">
-        <i class="fas fa-plus"></i>
-    </button>
     
     <!-- Toast Notification -->
     <div class="toast">
@@ -852,88 +838,88 @@
     </div>
     
     <script>
-        // Sample categories
-        let categories = [
-            "Daily Routine",
-            "Competition",
-            "Business",
-            "Personal Growth",
-            "Health & Fitness"
+        // Load data from localStorage or initialize with defaults
+        let categories = JSON.parse(localStorage.getItem('categories')) || [
+            "Daily Life", "Competition", "Business", "Personal Growth"
         ];
         
-        // Sample strategy data
-        let strategies = [
+        let strategies = JSON.parse(localStorage.getItem('strategies')) || [
             {
                 id: 1,
                 title: "Morning Routine Optimization",
-                category: "Daily Routine",
-                description: "Start each day with 30 minutes of planning, exercise, and meditation to maximize productivity and mental clarity.",
+                category: "daily",
+                description: "Start each day with 30 minutes of planning, exercise, and meditation to maximize productivity.",
                 priority: "high",
+                status: "planning",
                 active: true
             },
             {
                 id: 2,
                 title: "Competitive Analysis Framework",
-                category: "Competition",
-                description: "Analyze competitors using SWOT analysis every quarter to identify market opportunities and threats.",
+                category: "competition",
+                description: "Analyze competitors using SWOT analysis every quarter to identify market opportunities.",
                 priority: "high",
+                status: "active",
                 active: true
             },
             {
                 id: 3,
                 title: "Time Blocking Technique",
-                category: "Daily Routine",
-                description: "Divide your day into focused blocks of time dedicated to specific tasks to minimize distractions and improve efficiency.",
+                category: "daily",
+                description: "Divide your day into focused blocks of time dedicated to specific tasks to minimize distractions.",
                 priority: "medium",
+                status: "active",
                 active: true
             },
             {
                 id: 4,
                 title: "Pre-Game Mental Preparation",
-                category: "Competition",
+                category: "competition",
                 description: "Use visualization techniques and breathing exercises to achieve optimal mental state before competitions.",
                 priority: "medium",
+                status: "review",
                 active: false
             },
             {
                 id: 5,
                 title: "Decision Matrix for Choices",
-                category: "Business",
-                description: "Create a weighted matrix to evaluate options when facing complex decisions with multiple variables.",
+                category: "business",
+                description: "Create a weighted matrix to evaluate options when facing complex decisions.",
                 priority: "high",
+                status: "active",
                 active: true
             },
             {
                 id: 6,
                 title: "Networking Strategy",
-                category: "Business",
-                description: "Attend two industry events per month and follow up with five new contacts each week to expand your network.",
+                category: "business",
+                description: "Attend two industry events per month and follow up with five new contacts each week.",
                 priority: "medium",
+                status: "planning",
                 active: true
             },
             {
                 id: 7,
                 title: "Learning Sprint Technique",
-                category: "Personal Growth",
-                description: "Dedicate 25-minute focused sprints to learning new skills with 5-minute breaks in between to maximize retention.",
+                category: "personal",
+                description: "Dedicate 25-minute focused sprints to learning new skills with 5-minute breaks in between.",
                 priority: "low",
+                status: "review",
                 active: false
             },
             {
                 id: 8,
                 title: "Workout Routine Optimization",
-                category: "Health & Fitness",
-                description: "Combine strength training and cardio in alternating days for maximum fitness results with optimal recovery.",
+                category: "personal",
+                description: "Combine strength training and cardio in alternating days for maximum fitness results.",
                 priority: "medium",
+                status: "planning",
                 active: true
             }
         ];
         
         // DOM Elements
-        const strategyBoard = document.querySelector('.strategy-board');
         const strategyForm = document.getElementById('strategy-form');
-        const categoryFilters = document.getElementById('category-filters');
-        const categorySelect = document.getElementById('strategy-category');
         const toast = document.querySelector('.toast');
         const deleteModal = document.getElementById('delete-modal');
         const cancelDeleteBtn = document.getElementById('cancel-delete');
@@ -943,187 +929,151 @@
         const addCategoryBtn = document.getElementById('add-category-btn');
         const strategyNameSpan = document.getElementById('strategy-name');
         const newStrategyBtn = document.getElementById('new-strategy-btn');
+        const modeToggle = document.getElementById('mode-toggle');
+        const strategyFormContainer = document.getElementById('strategy-form-container');
         
         // Stats elements
         const totalStrategiesEl = document.getElementById('total-strategies');
         const activeStrategiesEl = document.getElementById('active-strategies');
         const totalCategoriesEl = document.getElementById('total-categories');
-        const competitionStrategiesEl = document.getElementById('competition-strategies');
         
         // State variables
         let strategyToDelete = null;
-        let selectedCategories = [];
-        let selectedStatus = "all";
-        let selectedPriority = "all";
+        let selectedCategory = "all";
+        let draggedElement = null;
         
         // Initialize the app
         function init() {
-            renderCategories();
             renderStrategies();
             updateStats();
             setupEventListeners();
+            setupDragAndDrop();
+            
+            // Check for saved theme
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+            }
         }
         
-        // Render categories in filters and select
-        function renderCategories() {
-            // Clear existing options
-            categoryFilters.innerHTML = '';
-            categorySelect.innerHTML = '<option value="">Select category</option>';
-            
-            // Add "All" option to filters
-            const allChip = document.createElement('div');
-            allChip.className = 'filter-chip active';
-            allChip.innerHTML = '<i class="fas fa-layer-group"></i> All';
-            allChip.dataset.filter = "category";
-            allChip.dataset.value = "all";
-            categoryFilters.appendChild(allChip);
-            
-            // Add each category to filters and select
-            categories.forEach(category => {
-                // Add to category filters
-                const chip = document.createElement('div');
-                chip.className = 'filter-chip';
-                chip.innerHTML = `<i class="fas fa-tag"></i> ${category}`;
-                chip.dataset.filter = "category";
-                chip.dataset.value = category;
-                categoryFilters.appendChild(chip);
-                
-                // Add to category select dropdown
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category;
-                categorySelect.appendChild(option);
-            });
-            
-            // Add event listeners to category filters
-            document.querySelectorAll('[data-filter="category"]').forEach(chip => {
-                chip.addEventListener('click', () => {
-                    const value = chip.dataset.value;
-                    
-                    if (value === "all") {
-                        // Toggle "All" chip
-                        document.querySelectorAll('[data-filter="category"]').forEach(c => c.classList.remove('active'));
-                        chip.classList.add('active');
-                        selectedCategories = [];
-                    } else {
-                        // Toggle specific category chip
-                        document.querySelector('[data-filter="category"][data-value="all"]').classList.remove('active');
-                        chip.classList.toggle('active');
-                        
-                        if (chip.classList.contains('active')) {
-                            selectedCategories.push(value);
-                        } else {
-                            selectedCategories = selectedCategories.filter(cat => cat !== value);
-                        }
-                        
-                        // If no categories selected, activate "All"
-                        if (selectedCategories.length === 0) {
-                            document.querySelector('[data-filter="category"][data-value="all"]').classList.add('active');
-                        }
-                    }
-                    
-                    renderStrategies();
-                });
-            });
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('categories', JSON.stringify(categories));
+            localStorage.setItem('strategies', JSON.stringify(strategies));
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         }
         
-        // Render strategy cards
+        // Render strategies on the board
         function renderStrategies() {
-            strategyBoard.innerHTML = '';
-            
-            // Filter strategies
-            let filteredStrategies = strategies.filter(strategy => {
-                // Category filter
-                if (selectedCategories.length > 0 && !selectedCategories.includes(strategy.category)) {
-                    return false;
-                }
-                
-                // Status filter
-                if (selectedStatus !== "all") {
-                    if (selectedStatus === "active" && !strategy.active) return false;
-                    if (selectedStatus === "inactive" && strategy.active) return false;
-                }
-                
-                // Priority filter
-                if (selectedPriority !== "all" && selectedPriority !== strategy.priority) {
-                    return false;
-                }
-                
-                return true;
+            // Clear all columns
+            document.querySelectorAll('.strategy-list').forEach(column => {
+                column.innerHTML = '';
             });
             
-            if (filteredStrategies.length === 0) {
-                strategyBoard.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-clipboard-list"></i>
-                        <h3>No Strategies Found</h3>
-                        <p>Try changing your filters or add a new strategy to get started.</p>
-                    </div>
-                `;
-                return;
+            // Reset counts
+            document.querySelectorAll('.count').forEach(countEl => {
+                countEl.textContent = '0';
+            });
+            
+            // Filter strategies by selected category
+            let filteredStrategies = strategies;
+            if (selectedCategory !== "all") {
+                filteredStrategies = strategies.filter(strategy => strategy.category === selectedCategory);
             }
             
+            // Add strategies to their respective columns
             filteredStrategies.forEach(strategy => {
-                const priorityClass = strategy.priority;
-                const priorityNames = {
-                    'high': 'High Priority',
-                    'medium': 'Medium Priority',
-                    'low': 'Low Priority'
-                };
-                
-                const strategyCard = document.createElement('div');
-                strategyCard.className = 'strategy-card';
-                strategyCard.innerHTML = `
-                    <div class="card-header">
-                        <h3>${strategy.title}</h3>
-                        <span class="category-tag">${strategy.category}</span>
-                    </div>
-                    <div class="card-body">
-                        <p>${strategy.description}</p>
-                        <div class="priority ${priorityClass}">
-                            <i class="fas fa-${priorityClass === 'high' ? 'exclamation-circle' : priorityClass === 'medium' ? 'arrow-up' : 'arrow-down'}"></i>
-                            ${priorityNames[strategy.priority]}
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <div class="toggle-container">
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="toggle-${strategy.id}" ${strategy.active ? 'checked' : ''}>
-                                <span class="slider"></span>
-                            </label>
-                            <span>${strategy.active ? 'Active' : 'Inactive'}</span>
-                        </div>
-                        <div class="actions">
-                            <button class="edit-btn" data-id="${strategy.id}">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="delete-btn" data-id="${strategy.id}">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                strategyBoard.appendChild(strategyCard);
-                
-                // Add event listener to the toggle
-                const toggle = strategyCard.querySelector(`#toggle-${strategy.id}`);
-                toggle.addEventListener('change', () => {
-                    toggleStrategyStatus(strategy.id, toggle.checked);
-                });
-                
-                // Add event listener to delete button
-                const deleteBtn = strategyCard.querySelector('.delete-btn');
-                deleteBtn.addEventListener('click', () => {
-                    showDeleteModal(strategy.id);
-                });
-                
-                // Add event listener to edit button
-                const editBtn = strategyCard.querySelector('.edit-btn');
-                editBtn.addEventListener('click', () => {
-                    editStrategy(strategy.id);
-                });
+                const column = document.querySelector(`.strategy-list#${strategy.status}-column`);
+                if (column) {
+                    const strategyCard = createStrategyCard(strategy);
+                    column.appendChild(strategyCard);
+                    
+                    // Update count
+                    const countEl = column.closest('.board-column').querySelector('.count');
+                    countEl.textContent = parseInt(countEl.textContent) + 1;
+                }
             });
+            
+            // Add empty state to columns with no strategies
+            document.querySelectorAll('.strategy-list').forEach(column => {
+                if (column.children.length === 0) {
+                    column.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-clipboard-list"></i>
+                            <h3>No Strategies</h3>
+                            <p>Add strategies to this column</p>
+                        </div>
+                    `;
+                }
+            });
+        }
+        
+        // Create strategy card element
+        function createStrategyCard(strategy) {
+            const priorityClass = strategy.priority;
+            const priorityNames = {
+                'high': 'High Priority',
+                'medium': 'Medium Priority',
+                'low': 'Low Priority'
+            };
+            
+            const categoryIcons = {
+                'daily': 'fas fa-sun',
+                'competition': 'fas fa-trophy',
+                'business': 'fas fa-briefcase',
+                'personal': 'fas fa-brain'
+            };
+            
+            const card = document.createElement('div');
+            card.className = 'strategy-card';
+            card.dataset.id = strategy.id;
+            card.draggable = true;
+            
+            card.innerHTML = `
+                <div class="card-header">
+                    <h4>${strategy.title}</h4>
+                    <div class="priority ${priorityClass}">
+                        ${priorityNames[strategy.priority]}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p>${strategy.description}</p>
+                </div>
+                <div class="card-footer">
+                    <div class="toggle-container">
+                        <label class="toggle-switch">
+                            <input type="checkbox" ${strategy.active ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                        <span>${strategy.active ? 'Active' : 'Inactive'}</span>
+                    </div>
+                    <div class="actions">
+                        <button class="edit-btn" data-id="${strategy.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="delete-btn" data-id="${strategy.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners
+            const toggle = card.querySelector('input[type="checkbox"]');
+            toggle.addEventListener('change', () => {
+                toggleStrategyStatus(strategy.id, toggle.checked);
+            });
+            
+            const deleteBtn = card.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', () => {
+                showDeleteModal(strategy.id);
+            });
+            
+            const editBtn = card.querySelector('.edit-btn');
+            editBtn.addEventListener('click', () => {
+                editStrategy(strategy.id);
+            });
+            
+            return card;
         }
         
         // Toggle strategy active status
@@ -1132,6 +1082,7 @@
             if (strategyIndex !== -1) {
                 strategies[strategyIndex].active = isActive;
                 updateStats();
+                saveData();
                 showToast(`Strategy marked as ${isActive ? 'active' : 'inactive'}`, 'success');
             }
         }
@@ -1159,6 +1110,7 @@
             strategies = strategies.filter(strategy => strategy.id !== strategyToDelete);
             renderStrategies();
             updateStats();
+            saveData();
             closeDeleteModal();
             showToast('Strategy deleted successfully', 'success');
         }
@@ -1171,7 +1123,7 @@
                 document.getElementById('strategy-title').value = strategy.title;
                 document.getElementById('strategy-category').value = strategy.category;
                 document.getElementById('strategy-priority').value = strategy.priority;
-                document.getElementById('strategy-status').value = strategy.active ? 'active' : 'inactive';
+                document.getElementById('strategy-status').value = strategy.status;
                 document.getElementById('strategy-description').value = strategy.description;
                 
                 // Change button to "Update Strategy"
@@ -1180,7 +1132,7 @@
                 submitBtn.dataset.editingId = id;
                 
                 // Scroll to form
-                document.querySelector('.add-strategy').scrollIntoView({ behavior: 'smooth' });
+                strategyFormContainer.scrollIntoView({ behavior: 'smooth' });
                 
                 showToast('Strategy loaded for editing', 'success');
             }
@@ -1209,7 +1161,7 @@
                         title,
                         category,
                         priority,
-                        active: status === 'active',
+                        status,
                         description
                     };
                     
@@ -1228,7 +1180,8 @@
                     category,
                     description,
                     priority,
-                    active: status === 'active'
+                    status,
+                    active: true
                 };
                 
                 strategies.push(newStrategy);
@@ -1239,6 +1192,7 @@
             strategyForm.reset();
             renderStrategies();
             updateStats();
+            saveData();
         }
         
         // Add new category
@@ -1248,13 +1202,48 @@
             
             if (!categories.includes(newCategory)) {
                 categories.push(newCategory);
-                renderCategories();
+                
+                // Add to category select
+                const select = document.getElementById('strategy-category');
+                const option = document.createElement('option');
+                option.value = newCategory.toLowerCase().replace(/\s+/g, '-');
+                option.textContent = newCategory;
+                select.appendChild(option);
+                
+                // Add to category list
+                const categoriesContainer = document.querySelector('.categories');
+                const chip = document.createElement('div');
+                chip.className = 'filter-chip';
+                chip.innerHTML = `<i class="fas fa-tag"></i> ${newCategory}`;
+                chip.dataset.category = newCategory.toLowerCase().replace(/\s+/g, '-');
+                categoriesContainer.appendChild(chip);
+                
+                // Add event listener
+                chip.addEventListener('click', () => {
+                    selectCategory(newCategory.toLowerCase().replace(/\s+/g, '-'));
+                });
+                
                 newCategoryInput.value = '';
                 showToast(`Category "${newCategory}" added`, 'success');
                 updateStats();
+                saveData();
             } else {
                 showToast(`Category "${newCategory}" already exists`, 'error');
             }
+        }
+        
+        // Select category
+        function selectCategory(category) {
+            selectedCategory = category;
+            
+            // Update UI
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            
+            document.querySelector(`.filter-chip[data-category="${category}"]`).classList.add('active');
+            
+            renderStrategies();
         }
         
         // Update stats display
@@ -1265,9 +1254,6 @@
             activeStrategiesEl.textContent = activeCount;
             
             totalCategoriesEl.textContent = categories.length;
-            
-            const competitionCount = strategies.filter(s => s.category === "Competition").length;
-            competitionStrategiesEl.textContent = competitionCount;
         }
         
         // Show toast notification
@@ -1286,9 +1272,71 @@
             }, 3000);
         }
         
+        // Setup drag and drop functionality
+        function setupDragAndDrop() {
+            const cards = document.querySelectorAll('.strategy-card');
+            const columns = document.querySelectorAll('.strategy-list');
+            
+            cards.forEach(card => {
+                card.addEventListener('dragstart', dragStart);
+                card.addEventListener('dragend', dragEnd);
+            });
+            
+            columns.forEach(column => {
+                column.addEventListener('dragover', dragOver);
+                column.addEventListener('dragenter', dragEnter);
+                column.addEventListener('dragleave', dragLeave);
+                column.addEventListener('drop', dragDrop);
+            });
+        }
+        
+        function dragStart() {
+            draggedElement = this;
+            this.classList.add('dragging');
+        }
+        
+        function dragEnd() {
+            this.classList.remove('dragging');
+        }
+        
+        function dragOver(e) {
+            e.preventDefault();
+        }
+        
+        function dragEnter(e) {
+            e.preventDefault();
+            this.classList.add('drop-over');
+        }
+        
+        function dragLeave() {
+            this.classList.remove('drop-over');
+        }
+        
+        function dragDrop() {
+            this.classList.remove('drop-over');
+            
+            // Update strategy status
+            const columnStatus = this.closest('.board-column').dataset.status;
+            const strategyId = parseInt(draggedElement.dataset.id);
+            const strategyIndex = strategies.findIndex(s => s.id === strategyId);
+            
+            if (strategyIndex !== -1) {
+                strategies[strategyIndex].status = columnStatus;
+                saveData();
+                renderStrategies();
+                showToast('Strategy status updated', 'success');
+            }
+        }
+        
+        // Toggle dark mode
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            saveData();
+        }
+        
         // Scroll to strategy form
         function scrollToForm() {
-            document.querySelector('.add-strategy').scrollIntoView({ 
+            strategyFormContainer.scrollIntoView({ 
                 behavior: 'smooth',
                 block: 'start'
             });
@@ -1318,39 +1366,17 @@
                 }
             });
             
-            // Status filter chips
-            document.querySelectorAll('[data-filter="status"]').forEach(chip => {
+            // Category filter chips
+            document.querySelectorAll('.filter-chip').forEach(chip => {
                 chip.addEventListener('click', () => {
-                    const value = chip.dataset.value;
-                    
-                    // Update selected status
-                    selectedStatus = value;
-                    
-                    // Update UI
-                    document.querySelectorAll('[data-filter="status"]').forEach(c => c.classList.remove('active'));
-                    chip.classList.add('active');
-                    
-                    renderStrategies();
+                    selectCategory(chip.dataset.category);
                 });
             });
             
-            // Priority filter chips
-            document.querySelectorAll('[data-filter="priority"]').forEach(chip => {
-                chip.addEventListener('click', () => {
-                    const value = chip.dataset.value;
-                    
-                    // Update selected priority
-                    selectedPriority = value;
-                    
-                    // Update UI
-                    document.querySelectorAll('[data-filter="priority"]').forEach(c => c.classList.remove('active'));
-                    chip.classList.add('active');
-                    
-                    renderStrategies();
-                });
-            });
+            // Dark mode toggle
+            modeToggle.addEventListener('click', toggleDarkMode);
             
-            // Floating button to scroll to form
+            // New strategy button
             newStrategyBtn.addEventListener('click', scrollToForm);
         }
         
